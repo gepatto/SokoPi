@@ -3,7 +3,7 @@
 	<!-- _________________________ Application Settings _________________________ -->
 
 	<app title="SokoPi" file="SokoPi" main="Main" version="0.0.1" company="Gepatto" unless="debug"/>
-	<app title="SokoPi" file="sokoPi_debug" main="Main" version="0.0.1" company="Gepatto" if="debug"/>
+	<app title="SokoPi" file="SokoPi_debug" main="Main" version="0.0.1" company="Gepatto" if="debug"/>
 
 	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
 		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"-->
@@ -15,7 +15,7 @@
 	<!-- ____________________________ Window Settings ___________________________ -->
 
 	<!--These window settings apply to all targets-->
-	<window width="640" height="480" fps="30" background="#000000" hardware="true" vsync="false" />
+	<window width="640" height="480" fps="60" background="#000000" hardware="true" vsync="false" />
 
 	<!--HTML5-specific-->
 	<window if="html5" resizable="false" />

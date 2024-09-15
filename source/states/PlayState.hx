@@ -2,22 +2,29 @@ package states;
 
 import flixel.FlxG;
 import flixel.FlxState;
+import flixel.FlxCamera;
 import flixel.addons.display.FlxBackdrop;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.group.FlxGroup;
 import flixel.text.FlxText;
 import lime.math.Vector2;
+import objects.Hud;
 import objects.Destination;
 import objects.GameObject;
 import objects.Player;
 import objects.Raspberry;
 import objects.Wall;
+import objects.Box;
 
 class PlayState extends FlxState {
+	
+	static var CAMERA_SPEED:Int = 8;
+	
 	var commander:CommandManager;
 
 	var blocks:FlxTypedGroup<GameObject> = new FlxTypedGroup(100);
 	var player:Player;
+	var hud:Hud;
 	var dest:Destination;
 	var destinations:Array<Destination> = [];
 
@@ -31,14 +38,17 @@ class PlayState extends FlxState {
 		selectedLevel = level;
 		var roomString = Helper.leftPad(level, "0");
 		room = 'assets/data/room_0$roomString.json';
+		
 	}
 
 	override public function create() {
 		var bg = new FlxBackdrop(AssetPaths.bg_plain__png, 5, 5);
 		add(bg);
+		bg.scrollFactor.set(0,0);
 
 		var map = new FlxOgmo3Loader(AssetPaths.sokpi__ogmo, room);
 		var ground = map.loadTilemap(AssetPaths.sokoban_tilesheet__png, "walls");
+		ground.follow();
 		add(ground);
 
 		commander = new CommandManager();
@@ -50,7 +60,11 @@ class PlayState extends FlxState {
 		add(blocks);
 		add(player);
 
-		createHUD();
+		camera.follow(player, FlxCameraFollowStyle.TOPDOWN,1);
+
+		hud = new Hud();
+		add(hud);
+		updateMoves();
 
 		super.create();
 	}
@@ -73,18 +87,8 @@ class PlayState extends FlxState {
 			openSubState(new PauseState());
 	}
 
-	function createHUD() {
-		var level = new FlxText(0, 0, 'level $selectedLevel', 16);
-		add(level);
-
-		movesText = new FlxText(level.x + level.width + 32, 0, '', 16);
-		add(movesText);
-		updateMoves();
-	}
-
 	function updateMoves() {
-		var moves = commander.count;
-		movesText.text = 'moves: $moves';
+		hud.updateHUD(commander.count,selectedLevel);
 	}
 
 	function checkVictory() {
@@ -99,16 +103,9 @@ class PlayState extends FlxState {
 		}
 		if (matches == destinations.length) {
 			FlxG.camera.shake(0.01, 0.2);
-			// openSubState(new states.VictoryState(selectedLevel, new Vector2(player.x + dest.width / 2, player.y + dest.height / 2)));
-			openSubState(new states.VictoryState(selectedLevel, new Vector2(player.x + player.width * .5, player.y - player.height * .5)));
+			final vicState = new states.VictoryState(selectedLevel, new Vector2(player.x + player.width * .5, player.y - player.height * .5));
+			openSubState(vicState);
 		}
-
-		// for (block in blocks) {
-		// 	if (block.coordX == dest.coordX && block.coordY == dest.coordY) {
-		// 		FlxG.camera.shake(0.01, 0.2)og;
-		// 		openSubState(new states.VictoryState(selectedLevel, new Vector2(dest.x + dest.width / 2, dest.y + dest.height / 2)));
-		// 	}
-		// }
 	}
 
 	function placeEntities(entity:EntityData) {
@@ -126,6 +123,7 @@ class PlayState extends FlxState {
 		var block:GameObject = switch (entity.name) {
 			case "wall": new Wall(coordX, coordY);
 			case "raspberry": new Raspberry(coordX, coordY);
+			case "box": new Box(coordX, coordY);
 			case _: null;
 		}
 

@@ -18,6 +18,7 @@ class MenuState extends FlxState {
 	var arrow:Arrow;
 	var levelIndex = 0;
 	var levelProgress:Int;
+	var bg:FlxBackdrop;
 
 	inline static var NUM_COLUMNS = 3;
 
@@ -25,9 +26,9 @@ class MenuState extends FlxState {
 		levelProgress = Helper.getLevelProgress();
 		levelIndex = levelProgress > 0 ? levelProgress - 1 : 0;
 
-		var bg = new FlxBackdrop(AssetPaths.bg__png, 0, 0);
+		bg = new FlxBackdrop(AssetPaths.bg__png, 0, 0);
 		add(bg);
-		bg.velocity.set(-25, 50);
+		bg.velocity.set(-12, 25);
 
 		add(new objects.Overlay());
 
